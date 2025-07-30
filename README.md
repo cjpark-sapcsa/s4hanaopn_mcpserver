@@ -19,7 +19,7 @@ This MCP (Model Context Protocol) server provides integration with SAP S/4HANA O
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
 │   AI Assistant  │    │   Azure APIM     │    │   S/4HANA System   │
-│   (Claude/etc)  │◄──►│   MCP Server     │◄──►│   OData APIs       │
+│ (GitHub/Copilot)│◄──►│   MCP Server     │◄──►│   OData APIs       │
 │                 │    │   (Functions)    │    │                     │
 └─────────────────┘    └──────────────────┘    └─────────────────────┘
 ```
