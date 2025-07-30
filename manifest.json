@@ -1,0 +1,277 @@
+{
+  "name": "s4hana-onprem-mcp-server",
+  "version": "1.0.0",
+  "description": "S/4HANA On-Premises MCP Server for Business Partner and Sales Order operations with intelligent workflow automation",
+  "author": {
+    "name": "chanpark",
+    "email": "Microsoft Cloud AI Platform"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/cjpark-sapcsa/s4hanaopn_mcpserver",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cjpark-sapcsa/s4hanaopn_mcpserver.git"
+  },
+  "mcpVersion": "2024-11-05",
+  "server": {
+    "command": "azure-functions",
+    "args": [],
+    "env": {
+      "SAP_USER": "${SAP_USER}",
+      "SAP_PASS": "${SAP_PASS}"
+    }
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false,
+      "supportsProgress": true
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {
+      "level": "info"
+    }
+  },
+  "tools": [
+    {
+      "name": "query_s4hana",
+      "description": "Query S/4HANA entities from Business Partner and Sales Order APIs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "S/4HANA OData entity name",
+            "enum": [
+              "businesspartners",
+              "businesspartneraddresses", 
+              "businesspartnercontacts",
+              "customers",
+              "suppliers",
+              "salesorders",
+              "salesorderitems",
+              "salesorderheaderpartners",
+              "salesorderitempartners",
+              "salesorderschedulelines",
+              "salesordertexts",
+              "salesorderitemtexts"
+            ]
+          },
+          "query": {
+            "type": "string",
+            "description": "Optional OData query parameters ($filter, $select, $top, $skip, etc.)",
+            "examples": [
+              "$top=10",
+              "$filter=SoldToParty eq '10100001'",
+              "$select=SalesOrder,SalesOrderType,SoldToParty&$top=5"
+            ]
+          }
+        },
+        "required": ["entity"]
+      }
+    },
+    {
+      "name": "create_s4hana_entity",
+      "description": "Create new entities in S/4HANA Business Partner or Sales Order APIs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "type": "string", 
+            "description": "S/4HANA entity to create",
+            "enum": [
+              "businesspartneraddresses",
+              "businesspartnercontacts",
+              "salesorders",
+              "salesorderitems",
+              "salesorderheaderpartners",
+              "salesorderitempartners",
+              "salesorderschedulelines",
+              "salesordertexts",
+              "salesorderitemtexts"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "description": "Entity data to create in S/4HANA format",
+            "examples": [
+              {
+                "SalesOrder": "0000000123",
+                "SalesOrderItem": "10",
+                "Material": "TG11",
+                "OrderQuantity": "5"
+              }
+            ]
+          }
+        },
+        "required": ["entity", "payload"]
+      }
+    },
+    {
+      "name": "check_and_create_sales_orders",
+      "description": "PoC workflow: Check existing sales orders and automatically create line items if lacking",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "customer_filter": {
+            "type": "string",
+            "description": "Optional OData filter for specific customer",
+            "examples": [
+              "SoldToParty eq '10100001'",
+              "SalesOrderType eq 'OR'"
+            ]
+          },
+          "min_orders": {
+            "type": "integer",
+            "description": "Minimum number of orders expected",
+            "default": 1,
+            "minimum": 1
+          },
+          "line_items_to_create": {
+            "type": "array",
+            "description": "Sales order line items to create if order count is below threshold",
+            "items": {
+              "type": "object",
+              "properties": {
+                "SalesOrder": {"type": "string"},
+                "SalesOrderItem": {"type": "string"},
+                "Material": {"type": "string"},
+                "OrderQuantity": {"type": "string"}
+              },
+              "required": ["SalesOrder", "SalesOrderItem", "Material", "OrderQuantity"]
+            }
+          }
+        },
+        "required": ["line_items_to_create"]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "s4hana://business-partners",
+      "name": "S/4HANA Business Partners",
+      "description": "Access to S/4HANA Business Partner master data",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "s4hana://sales-orders", 
+      "name": "S/4HANA Sales Orders",
+      "description": "Access to S/4HANA Sales Order transactional data",
+      "mimeType": "application/json"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "analyze_sales_performance",
+      "description": "Analyze sales order performance and suggest improvements",
+      "arguments": [
+        {
+          "name": "customer_id",
+          "description": "Customer ID to analyze",
+          "required": false
+        },
+        {
+          "name": "time_period",
+          "description": "Time period for analysis (e.g., 'last_30_days')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "create_missing_orders",
+      "description": "Generate sales order line items based on business rules",
+      "arguments": [
+        {
+          "name": "customer_requirements",
+          "description": "Customer-specific requirements for order creation",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "config": {
+    "endpoints": {
+      "base_url": "https://your-apim-instance.azure-api.net/s4hana-mcp",
+      "tools_discovery": "/tools",
+      "query": "/query", 
+      "create": "/create",
+      "workflow": "/workflow"
+    },
+    "authentication": {
+      "type": "subscription_key",
+      "location": "header",
+      "name": "Ocp-Apim-Subscription-Key"
+    },
+    "rate_limits": {
+      "requests_per_minute": 100,
+      "burst_limit": 10
+    },
+    "timeouts": {
+      "query_timeout": 30,
+      "create_timeout": 60,
+      "workflow_timeout": 120
+    }
+  },
+  "metadata": {
+    "tags": ["s4hana", "erp", "business-partner", "sales-order", "mcp", "azure", "onprem"],
+    "category": "Enterprise Integration",
+    "documentation": "https://docs.company.com/s4hana-mcp-server",
+    "support": "https://support.company.com/s4hana-integration",
+    "deployment": {
+      "type": "azure-functions",
+      "runtime": "python-3.11",
+      "region": "North Europe",
+      "tier": "consumption"
+    },
+    "apis": {
+      "business_partner": {
+        "base_url": "http://sbx-s4s-app.northeurope.cloudapp.azure.com:54000/sap/opu/odata/sap/API_BUSINESS_PARTNER",
+        "version": "1.0.0",
+        "entities": [
+          "A_BusinessPartner",
+          "A_BusinessPartnerAddress", 
+          "A_BusinessPartnerContact",
+          "A_Customer",
+          "A_Supplier"
+        ]
+      },
+      "sales_order": {
+        "base_url": "http://sbx-s4s-app.northeurope.cloudapp.azure.com:54000/sap/opu/odata/sap/API_SALES_ORDER_SRV",
+        "version": "1.0.0", 
+        "entities": [
+          "A_SalesOrder",
+          "A_SalesOrderItem",
+          "A_SalesOrderHeaderPartner",
+          "A_SalesOrderItemPartner",
+          "A_SalesOrderScheduleLine",
+          "A_SalesOrderText",
+          "A_SalesOrderItemText"
+        ]
+      }
+    }
+  },
+  "security": {
+    "required_scopes": ["s4hana:read", "s4hana:write"],
+    "oauth2": {
+      "authorization_url": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize",
+      "token_url": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token",
+      "scopes": {
+        "s4hana:read": "Read access to S/4HANA data",
+        "s4hana:write": "Write access to S/4HANA data"
+      }
+    }
+  },
+  "monitoring": {
+    "health_check": "/health",
+    "metrics": "/metrics",
+    "logging": {
+      "level": "info",
+      "destinations": ["azure-monitor", "application-insights"]
+    }
+  }
+}

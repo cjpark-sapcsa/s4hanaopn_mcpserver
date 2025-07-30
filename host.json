@@ -1,0 +1,34 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
+    },
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Error",
+      "Function": "Information",
+      "Host.Aggregator": "Trace"
+    }
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[4.*, 5.0.0)"
+  },
+  "functionTimeout": "00:05:00",
+  "retry": {
+    "strategy": "fixedDelay",
+    "maxRetryCount": 3,
+    "delayInterval": "00:00:02"
+  },
+  "healthMonitor": {
+    "enabled": true,
+    "healthCheckInterval": "00:00:30",
+    "healthCheckWindow": "00:02:00",
+    "healthCheckThreshold": 6,
+    "counterThreshold": 0.8
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "SAP_BASE_URL": "http://your-s4hana-server:port",
+    "SAP_USER": "your-sap-username", 
+    "SAP_PASS": "your-sap-password"
+  }
+}

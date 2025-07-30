@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info:
+  title: S/4HANA Operations Connector
+  description: |
+    S/4HANA MCP server assistant that dynamically generates OData queries from natural language.
+    
+    CORE BEHAVIOR:
+    - NEVER ask for OData parameters or entity names
+    - ALWAYS auto-generate queries from user requests  
+    - Translate business language to S/4HANA operations
+    
+    DYNAMIC MAPPING:
+    "sales orders for customer X" → entity="salesorders", query="$filter=SoldToParty eq 'X'"
+    "top 5 highest orders" → query="$top=5&$orderby=TotalNetAmount desc"
+    "pending orders" → query="$filter=OverallSDProcessStatus eq 'B'"
+    "customer info for X" → entity="businesspartners", query="$filter=BusinessPartner eq 'X'"
+    
+    AUTO-EXTRACT:
+    - Customer IDs (USCU_L10, etc.)
+    - Quantities (top 5, more than 1000)
+    - Status (pending, completed)
+    - Dates (recent, this month)
+    
+    RESPONSE FORMAT:
+    - Business-friendly tables
+    - Include totals/summaries
+    - Actionable insights
+    
+    Make S/4HANA access as simple as asking a business question. Handle all technical complexity automatically.
+  version: '2.3.0'
+  contact:
+    name: Microsoft Cloud AI Platform
+    email: chanpark@microsoft.com
+servers:
+  - url: https://mcp2sapdemo.azure-api.net/s4hana-mcp-v2
+    description: Production APIM Gateway
+
+paths:
+  /sse:
+    get:
+      summary: S/4HANA Schema Discovery
+      description: 'Returns the OpenAPI 3.0 schema describing available S/4HANA MCP tools and parameters for automatic tool discovery by Copilot, Teams, or other agentic clients. This endpoint enables tool registration and schema-driven workflows'
+      operationId: Get-sse-schema-discovery
+      responses:
+        '200':
+          description: Schema discovery response
+    options:
+      summary: S/4HANA Schema Discovery
+      description: 'Returns the OpenAPI 3.0 schema describing available S/4HANA MCP tools and parameters for automatic tool discovery by Copilot, Teams, or other agentic clients. This endpoint enables tool registration and schema-driven workflows'
+      operationId: Options-sse-schema-discovery
+      responses:
+        '200':
+          description: CORS preflight response
+    post:
+      summary: S/4HANA Operations Handler
+      description: "Receives MCP JSON-RPC 2.0 protocol requests for S/4HANA operations with intelligent natural language processing.\n\nThis endpoint automatically translates natural language requests into S/4HANA operations. Users can ask questions like:\n- 'Show me all sales orders for customer USCU_L10'\n- 'What are the top 3 highest value sales orders for customer USCU_L10?'\n- 'List all pending sales orders for customer USCU_L10'\n\nThe AI agent will automatically construct the appropriate OData queries, entity selections, and filters.\n\nExample MCP request:\n{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"query_s4hana\",\n    \"arguments\": {\n      \"entity\": \"salesorders\",\n      \"query\": \"$filter=SoldToParty eq 'USCU_L10'&$top=5\"\n    }\n  },\n  \"id\": 1\n}\n\nThe backend routes requests to Azure Function handlers for S/4HANA system integration.\n"
+      operationId: Post-sse-handler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                  description: "JSON-RPC protocol version"
+                  default: "2.0"
+                method:
+                  type: string
+                  enum: ["tools/call"] 
+                  description: "MCP method name"
+                  default: "tools/call"
+                params:
+                  type: object
+                  description: "Tool call parameters"
+                  required: ["name"]
+                  properties:
+                    name:
+                      type: string
+                      description: "Tool name to execute"
+                      enum: ["query_s4hana", "create_s4hana_entity", "check_and_create_sales_orders"]
+                      default: "query_s4hana"
+                      x-ms-summary: "Tool Name"
+                    arguments:
+                      type: object
+                      description: "Tool arguments"
+                      required: ["entity", "query"]
+                      properties:
+                        entity:
+                          type: string
+                          description: "S/4HANA entity type"
+                          enum: [
+                            "businesspartners",
+                            "businesspartneraddresses", 
+                            "businesspartnercontacts",
+                            "customers",
+                            "suppliers", 
+                            "salesorders",
+                            "salesorderitems",
+                            "salesorderheaderpartners",
+                            "salesorderitempartners",
+                            "salesorderschedulelines",
+                            "salesordertexts",
+                            "salesorderitemtexts"
+                          ]
+                          default: "salesorders"
+                        query:
+                          type: string
+                          description: "OData query parameters"
+                          default: "$top=10"
+                id:
+                  type: integer
+                  description: "Request ID for correlation"
+                  default: 1
+              required: ["jsonrpc", "method", "params", "id"]
+      responses:
+        '200':
+          description: S/4HANA operation result
+
+components:
+  schemas:
+    S4HANAResponse:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum: ["2.0"]
+        id:
+          type: integer
+        result:
+          type: object
+          x-ms-summary: Operation Result
+          properties:
+            tools:
+              type: array
+              description: Available tools (for tools/list method)
+              x-ms-summary: Available Tools
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  inputSchema:
+                    type: object
+            content:
+              type: array
+              description: Tool execution results (for tools/call method)
+              x-ms-summary: Execution Results
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: ["text"]
+                  text:
+                    type: string
+                    description: S/4HANA data
+        error:
+          type: object
+          description: Error information (if request failed)
+          x-ms-summary: Error Details
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+            data:
+              type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+      description: APIM subscription key in header
+
+security:
+  - apiKeyHeader: [ ]
+
+tags:
+  - name: S/4HANA Operations
+    description: SAP S/4HANA business operations and data access
