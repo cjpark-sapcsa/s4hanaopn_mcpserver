@@ -191,6 +191,24 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 
 ## Installation
 
+### Build End-to-End Flow
+
+> **Note**: Add the `Build end to end Flow.png` image file to the repository root to display the complete deployment workflow diagram.
+
+<!-- ![Build end to end Flow](Build%20end%20to%20end%20Flow.png) -->
+
+The complete deployment follows this sequence:
+1. **Azure Functions Development** → Local MCP server development and testing
+2. **Deployment to Azure Portal** → Azure Functions deployment with environment configuration
+3. **APIM Import API** → Import Azure Functions as backend API in API Management
+4. **Creation of MCP Server Under APIM** → Export APIM API as MCP server endpoint
+5. **Export of OpenAPI v3 (YAML or JSON)** → Generate API specification for Copilot Studio
+6. **Copilot Studio Creation of Agent** → Create AI agent using OpenAPI specification
+7. **Creation of Custom Connector** → Power Automate connector for Teams integration
+8. **Add Custom Connector as Tool in Copilot Studio** → Integrate approval workflow in agent
+9. **Test run for MCP Tool Discovery** → Validate complete end-to-end functionality
+10. **Publish into Copilot Agent** → Deploy agent for business user access
+
 ### Step 1: Environment Setup
 
 1. **Clone the repository**:
@@ -279,7 +297,7 @@ Create `.vscode/mcp.json`:
 }
 ```
 
-### Step 3: Azure Resource Setup
+### Step 3: Azure Resource Setup & APIM MCP Server Creation
 
 1. **Create Azure Resource Group**:
 ```bash
@@ -312,6 +330,19 @@ az storage container create \
   --auth-mode login
 ```
 
+5. **Create API Management Service** (Required for MCP Server):
+```bash
+az apim create \
+  --resource-group rg-s4hana-mcp \
+  --name your-s4hana-apim \
+  --publisher-email admin@yourcompany.com \
+  --publisher-name "Your Company" \
+  --sku-name Basic \
+  --location eastus
+```
+
+> **Note**: APIM creation takes 30-45 minutes. Continue with other steps while it provisions.
+
 ### Step 4: Local Testing
 
 1. **Start Azure Functions locally**:
@@ -334,14 +365,16 @@ Functions:
 curl http://localhost:7071/api/health
 ```
 
-3. **Test MCP tools discovery**:
+3. **Test MCP tools discovery (Local only)**:
 ```bash
 curl -X POST http://localhost:7071/api/sse \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
 ```
 
-### Step 5: Azure Deployment
+> **Note**: For production MCP tool discovery, use the APIM endpoint from Step 5 after deployment.
+
+### Step 5: Azure Deployment & APIM MCP Server Setup
 
 1. **Create Azure Function App**:
 ```bash
@@ -374,22 +407,46 @@ az functionapp config appsettings set \
     BLOB_CONTAINER_NAME="salesorderrequest"
 ```
 
+4. **Import Azure Function into APIM**:
+   - Navigate to Azure Portal → API Management → your-s4hana-apim
+   - Select **APIs** → **Add API** → **Function App**
+   - Choose your deployed Function App: `your-s4hana-mcp-app`
+   - Import all functions as API endpoints
+
+5. **Create MCP Server from APIM**:
+
+> **Microsoft Reference**: [Export a REST API from Azure API Management as an MCP server](https://learn.microsoft.com/en-us/azure/api-management/export-rest-mcp-server#expose-api-as-an-mcp-server)
+
+   - In APIM → **APIs** → Select your imported Function App API
+   - Click **Export** → **Model Context Protocol (MCP)**
+   - Configure MCP server settings:
+     - **Server Name**: `s4hana-mcp-server`
+     - **Description**: `S/4HANA Sales Operations MCP Server`
+     - **Endpoint**: `/mcp` (auto-generated)
+   - Generate subscription key for secure access
+
+6. **Get MCP Server Endpoint**:
+   - **MCP URL**: `https://your-s4hana-apim.azure-api.net/mcp`
+   - **Subscription Key**: Copy from APIM → Subscriptions
+   - **Backend**: `https://your-s4hana-mcp-app.azurewebsites.net`
+
 ### Step 6: Copilot Studio MCP Integration
 
 > **Official Guide**: Follow the Microsoft official documentation: [Extend agent actions using Model Context Protocol (MCP)](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp)
 
 #### Prerequisites for Copilot Studio MCP Integration
 - **Copilot Studio License**: Required for agent creation and MCP integration
-- **Azure Function App**: Your S/4HANA MCP server deployed and running
+- **APIM MCP Server**: Your S/4HANA MCP server deployed via APIM (Step 5)
 - **Admin Access**: Copilot Studio environment admin permissions
-- **MCP Server Endpoint**: Public HTTPS endpoint for your Azure Function
+- **Subscription Key**: APIM subscription key for secure access
 
 #### 1. **Prepare MCP Server Endpoint**
-Ensure your Azure Function App is accessible via HTTPS:
+Ensure your APIM MCP server is accessible:
 ```bash
 # Verify your MCP server is accessible
-curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
+curl -X POST https://your-s4hana-apim.azure-api.net/mcp \
   -H "Content-Type: application/json" \
+  -H "Ocp-Apim-Subscription-Key: your-subscription-key" \
   -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
 ```
 
@@ -469,46 +526,6 @@ After connecting, Copilot Studio will discover available MCP tools:
    - Share agent with business users
    - Provide guidance on S/4HANA operations
    - Explain approval workflow process
-
-#### 8. **APIM Gateway (Mandatory)**
-For enhanced security and management, APIM is required for production MCP server deployment:
-
-> **Microsoft Reference**: Follow the official guide: [Export a REST API from Azure API Management as an MCP server](https://learn.microsoft.com/en-us/azure/api-management/export-rest-mcp-server#expose-api-as-an-mcp-server)
-
-1. **Create API Management Service**:
-```bash
-az apim create \
-  --resource-group rg-s4hana-mcp \
-  --name your-s4hana-apim \
-  --publisher-email admin@yourcompany.com \
-  --publisher-name "Your Company" \
-  --sku-name Basic \
-  --location eastus
-```
-
-2. **Configure APIM as MCP Gateway**:
-   - **Import Azure Function as Backend**: Add your Function App as APIM backend service
-   - **Set up Subscription Keys**: Configure API subscription keys for secure access
-   - **Configure Rate Limiting**: Implement policies for request throttling and quotas
-   - **MCP Server Export**: Use APIM's MCP server export functionality
-   - **Update Client Configuration**: Configure MCP clients to use APIM endpoint
-
-3. **MCP Server URL Configuration**:
-   - **APIM MCP Endpoint**: `https://your-s4hana-apim.azure-api.net/mcp`
-   - **Subscription Key Header**: `Ocp-Apim-Subscription-Key`
-   - **Function Backend**: `https://your-s4hana-mcp-app.azurewebsites.net`
-
-4. **Update Copilot Studio Configuration**:
-   ```json
-   {
-     "url": "https://your-s4hana-apim.azure-api.net/mcp",
-     "headers": {
-       "Ocp-Apim-Subscription-Key": "your-subscription-key"
-     }
-   }
-   ```
-
-> **Note**: APIM Gateway is mandatory for production deployments to ensure enterprise-grade security, monitoring, and management of the MCP server.
 
 ### Step 7: Power Automate & Teams Setup
 
