@@ -341,38 +341,7 @@ az apim create \
 
 > **Note**: APIM creation takes 30-45 minutes. Continue with other steps while it provisions.
 
-### Step 4: Local Testing
-
-1. **Start Azure Functions locally**:
-```bash
-func start
-```
-
-You should see output like:
-```
-Functions:
-    sse: [GET,POST] http://localhost:7071/api/sse
-    approve-request: [GET,POST] http://localhost:7071/api/approve-request
-    reject-request: [GET,POST] http://localhost:7071/api/reject-request
-    create-so-request: [POST] http://localhost:7071/api/create-so-request
-    health: [GET] http://localhost:7071/api/health
-```
-
-2. **Test health endpoint**:
-```bash
-curl http://localhost:7071/api/health
-```
-
-3. **Test MCP tools discovery (Local only)**:
-```bash
-curl -X POST http://localhost:7071/api/sse \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
-```
-
-> **Note**: For production MCP tool discovery, use the APIM endpoint from Step 5 after deployment.
-
-### Step 5: Azure Deployment & APIM MCP Server Setup
+### Step 4: Azure Deployment & APIM MCP Server Setup
 
 1. **Create Azure Function App**:
 ```bash
@@ -428,13 +397,55 @@ az functionapp config appsettings set \
    - **Subscription Key**: Copy from APIM → Subscriptions
    - **Backend**: `https://your-s4hana-mcp-app.azurewebsites.net`
 
+### Step 5: Local Testing & Verification
+
+1. **Start Azure Functions locally**:
+```bash
+func start
+```
+
+You should see output like:
+```
+Functions:
+    sse: [GET,POST] http://localhost:7071/api/sse
+    approve-request: [GET,POST] http://localhost:7071/api/approve-request
+    reject-request: [GET,POST] http://localhost:7071/api/reject-request
+    create-so-request: [POST] http://localhost:7071/api/create-so-request
+    health: [GET] http://localhost:7071/api/health
+```
+
+2. **Test health endpoint**:
+```bash
+curl http://localhost:7071/api/health
+```
+
+3. **Test MCP tools discovery (Local)**:
+```bash
+curl -X POST http://localhost:7071/api/sse \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
+```
+
+4. **Test Azure Functions endpoint (after deployment)**:
+```bash
+curl https://your-s4hana-mcp-app.azurewebsites.net/api/health
+```
+
+5. **Test APIM MCP endpoint (production)**:
+```bash
+curl -X POST https://your-s4hana-apim.azure-api.net/mcp \
+  -H "Content-Type: application/json" \
+  -H "Ocp-Apim-Subscription-Key: your-subscription-key" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
+```
+
 ### Step 6: Copilot Studio MCP Integration
 
 > **Official Guide**: Follow the Microsoft official documentation: [Extend agent actions using Model Context Protocol (MCP)](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp)
 
 #### Prerequisites for Copilot Studio MCP Integration
 - **Copilot Studio License**: Required for agent creation and MCP integration
-- **APIM MCP Server**: Your S/4HANA MCP server deployed via APIM (Step 5)
+- **APIM MCP Server**: Your S/4HANA MCP server deployed via APIM (Step 4)
 - **Admin Access**: Copilot Studio environment admin permissions
 - **Subscription Key**: APIM subscription key for secure access
 
