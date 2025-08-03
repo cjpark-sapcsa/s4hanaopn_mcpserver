@@ -193,7 +193,6 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 
 ### Build End-to-End Flow
 
-> **Note**: Add the `Build end to end Flow.png` image file to the repository root to display the complete deployment workflow diagram.
 <img width="2104" height="1160" alt="build end to end MCP server" src="https://github.com/user-attachments/assets/aded88db-a000-4b73-b1db-13d453c7bdfa" />
 
 The complete deployment follows this sequence:
