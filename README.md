@@ -57,7 +57,7 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 - **Security Framework**: Environment-based configuration with managed identity support
 
 ### Key Features
-- **2000+ lines of production-ready code** with comprehensive error handling
+- **production-ready code** with comprehensive error handling
 - **14 Azure Function endpoints** covering MCP, Copilot Studio, and approval workflows
 - **Intelligent date parsing** supporting multiple formats with S/4HANA conversion
 - **Persistent approval tracking** using Azure Blob Storage for scalability
@@ -193,9 +193,7 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 
 ### Build End-to-End Flow
 
-![Build end to end Flow](images/Build-end-to-end-Flow.png)
-
-> **Note**: The complete deployment workflow diagram is located in the `images/` directory. If the image doesn't display, ensure the `Build-end-to-end-Flow.png` file is placed in the `images/` folder.
+<img width="2104" height="1160" alt="build end to end MCP server" src="https://github.com/user-attachments/assets/aded88db-a000-4b73-b1db-13d453c7bdfa" />
 
 The complete deployment follows this sequence:
 1. **Azure Functions Development** → Local MCP server development and testing
