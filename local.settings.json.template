@@ -1,10 +1,16 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "python",
     "SAP_BASE_URL": "http://your-s4hana-server:port",
-    "SAP_USER": "your-sap-username", 
-    "SAP_PASS": "your-sap-password"
+    "SAP_USER": "your-sap-username",
+    "SAP_PASS": "your-sap-password",
+    "FUNCTION_APP_BASE_URL": "https://your-function-app.azurewebsites.net",
+    "TEAMS_WEBHOOK_URL": "https://your-teams-webhook-url",
+    "AZURE_STORAGE_CONNECTION_STRING": "your-azure-storage-connection-string",
+    "BLOB_STORAGE_URL": "https://your-storage-account.blob.core.windows.net/salesorderrequest",
+    "BLOB_STORAGE_ACCOUNT_URL": "https://your-storage-account.blob.core.windows.net",
+    "BLOB_CONTAINER_NAME": "salesorderrequest"
   }
 }

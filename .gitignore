@@ -73,3 +73,11 @@ node_modules/
 *.p12
 *.pfx
 secrets/
+
+# PowerShell scripts with sensitive deployment info
+*.ps1
+test*.json
+test-*
+*.ps1
+mcp.json
+.vscode/mcp.json

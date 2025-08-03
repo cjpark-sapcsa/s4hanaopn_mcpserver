@@ -1,38 +1,61 @@
 openapi: 3.0.3
 info:
-  title: S/4HANA Operations Connector
+  title: Enterprise S/4HANA AI Agent with MCP Server Integration
   description: |
-    S/4HANA MCP server assistant that dynamically generates OData queries from natural language.
+    An enterprise-grade AI agent integrated with a secure, APIM-protected MCP Server that enables direct interaction with on-premise SAP S/4HANA systems. Supports real-time Sales Order and Business Partner operations via OData APIs using natural language.
+
+    ENTERPRISE CAPABILITIES:
+    This agent allows users in Microsoft 365 to:
+    • Create and validate Sales Orders with approval workflows
+    • Query top customers, past order values, and payment terms
+    • Automate workflows like checking order thresholds and generating line items
+    • Trigger predefined logic across salesorders, businesspartners, and related entities
     
-    CORE BEHAVIOR:
-    - NEVER ask for OData parameters or entity names
-    - ALWAYS auto-generate queries from user requests  
-    - Translate business language to S/4HANA operations
+    SECURITY & GOVERNANCE:
+    • Secure Azure Functions backend with APIM gateway protection
+    • Complete auditability and validation for all operations
+    • Entity-level constraints and access controls
+    • Human-in-the-loop approval for write operations
+    • Microsoft Teams integration for real-time notifications
     
-    DYNAMIC MAPPING:
+    NATURAL LANGUAGE PROCESSING:
+    • Translate business questions into S/4HANA operations automatically
+    • No technical OData knowledge required from end users
+    • Intelligent entity and parameter extraction from user requests
+    
+    DYNAMIC QUERY MAPPING:
     "sales orders for customer X" → entity="salesorders", query="$filter=SoldToParty eq 'X'"
     "top 5 highest orders" → query="$top=5&$orderby=TotalNetAmount desc"
     "pending orders" → query="$filter=OverallSDProcessStatus eq 'B'"
     "customer info for X" → entity="businesspartners", query="$filter=BusinessPartner eq 'X'"
     
-    AUTO-EXTRACT:
-    - Customer IDs (USCU_L10, etc.)
-    - Quantities (top 5, more than 1000)
-    - Status (pending, completed)
-    - Dates (recent, this month)
+    PRODUCTION EXAMPLES:
+    ✅ Successfully created Sales Order 5108 for customer USCU_L10
+    ✅ Automated approval workflow with request ID SO-REQ-20250801151549
+    ✅ Created 3 line items: 200×TG11, 75×TG12, 50×TG13 ($5,671.25 total)
+    ✅ Teams notification integration confirmed working
     
-    RESPONSE FORMAT:
-    - Business-friendly tables
-    - Include totals/summaries
-    - Actionable insights
+    SUPPORTED ENTITIES:
+    • Sales Orders & Line Items
+    • Business Partners & Customers
+    • Order Headers & Partners
+    • Schedule Lines & Text Elements
     
-    Make S/4HANA access as simple as asking a business question. Handle all technical complexity automatically.
-  version: '2.3.0'
+    Perfect for enterprise environments requiring secure, governed, and auditable access to SAP S/4HANA data through familiar Microsoft 365 tools.
+    
+    RECENT UPDATES (v3.1.0):
+    • Enhanced sales order creation with automatic line item support
+    • Improved date format handling for delivery dates
+    • Validated approval workflow with Teams integration
+    • Production-tested with customer USCU_L10 order processing
+    • Last updated: August 1, 2025
+    • Import-ready OpenAPI 3.0.3 specification
+  version: '3.1.0'
   contact:
     name: Microsoft Cloud AI Platform
-    email: chanpark@microsoft.com
+    email: admin@yourcompany.com
 servers:
-  - url: https://mcp2sapdemo.azure-api.net/s4hana-mcp-v2
+  - url: https://your-apim-gateway.azure-api.net/s4hana-mcp-server
     description: Production APIM Gateway
 
 paths:
@@ -41,13 +64,25 @@ paths:
       summary: S/4HANA Schema Discovery
       description: 'Returns the OpenAPI 3.0 schema describing available S/4HANA MCP tools and parameters for automatic tool discovery by Copilot, Teams, or other agentic clients. This endpoint enables tool registration and schema-driven workflows'
       operationId: Get-sse-schema-discovery
+      x-ms-summary: Get S/4HANA Schema
       responses:
         '200':
           description: Schema discovery response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tools:
+                    type: array
+                    x-ms-summary: Available Tools
+                    items:
+                      type: object
     options:
       summary: S/4HANA Schema Discovery
       description: 'Returns the OpenAPI 3.0 schema describing available S/4HANA MCP tools and parameters for automatic tool discovery by Copilot, Teams, or other agentic clients. This endpoint enables tool registration and schema-driven workflows'
       operationId: Options-sse-schema-discovery
+      x-ms-summary: CORS Preflight for Schema
       responses:
         '200':
           description: CORS preflight response
@@ -55,6 +90,7 @@ paths:
       summary: S/4HANA Operations Handler
       description: "Receives MCP JSON-RPC 2.0 protocol requests for S/4HANA operations with intelligent natural language processing.\n\nThis endpoint automatically translates natural language requests into S/4HANA operations. Users can ask questions like:\n- 'Show me all sales orders for customer USCU_L10'\n- 'What are the top 3 highest value sales orders for customer USCU_L10?'\n- 'List all pending sales orders for customer USCU_L10'\n\nThe AI agent will automatically construct the appropriate OData queries, entity selections, and filters.\n\nExample MCP request:\n{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"query_s4hana\",\n    \"arguments\": {\n      \"entity\": \"salesorders\",\n      \"query\": \"$filter=SoldToParty eq 'USCU_L10'&$top=5\"\n    }\n  },\n  \"id\": 1\n}\n\nThe backend routes requests to Azure Function handlers for S/4HANA system integration.\n"
       operationId: Post-sse-handler
+      x-ms-summary: Execute S/4HANA Operation
       requestBody:
         required: true
         content:
@@ -67,26 +103,30 @@ paths:
                   enum: ["2.0"]
                   description: "JSON-RPC protocol version"
                   default: "2.0"
+                  x-ms-summary: "JSON-RPC Version"
                 method:
                   type: string
                   enum: ["tools/call"] 
                   description: "MCP method name"
                   default: "tools/call"
+                  x-ms-summary: "MCP Method"
                 params:
                   type: object
                   description: "Tool call parameters"
                   required: ["name"]
+                  x-ms-summary: "Tool Parameters"
                   properties:
                     name:
                       type: string
                       description: "Tool name to execute"
-                      enum: ["query_s4hana", "create_s4hana_entity", "check_and_create_sales_orders"]
+                      enum: ["query_s4hana", "create_s4hana_entity", "check_and_create_sales_orders", "check_approval_status"]
                       default: "query_s4hana"
                       x-ms-summary: "Tool Name"
                     arguments:
                       type: object
                       description: "Tool arguments"
                       required: ["entity", "query"]
+                      x-ms-summary: "Tool Arguments"
                       properties:
                         entity:
                           type: string
@@ -106,18 +146,307 @@ paths:
                             "salesorderitemtexts"
                           ]
                           default: "salesorders"
+                          x-ms-summary: "Entity Type"
                         query:
                           type: string
                           description: "OData query parameters"
                           default: "$top=10"
+                          x-ms-summary: "OData Query"
                 id:
                   type: integer
                   description: "Request ID for correlation"
                   default: 1
+                  x-ms-summary: "Request ID"
               required: ["jsonrpc", "method", "params", "id"]
       responses:
         '200':
           description: S/4HANA operation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/S4HANAResponse'
+
+  /tools:
+    get:
+      tags:
+        - S/4HANA Operations
+      summary: MCP Tools Discovery
+      description: "Returns available MCP tools for schema discovery"
+      operationId: Get-tools-discovery
+      x-ms-summary: Get Available Tools
+      responses:
+        '200':
+          description: Available tools schema
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tools:
+                    type: array
+                    x-ms-summary: Available Tools
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          x-ms-summary: Tool Name
+                        description:
+                          type: string
+                          x-ms-summary: Tool Description
+                        inputSchema:
+                          type: object
+                          x-ms-summary: Tool Input Schema
+    options:
+      tags:
+        - S/4HANA Operations
+      summary: MCP Tools Discovery (CORS)
+      description: "CORS preflight for tools discovery"
+      operationId: Options-tools-discovery
+      x-ms-summary: CORS Preflight for Tools
+      responses:
+        '200':
+          description: CORS preflight response
+
+  /create-so-request:
+    post:
+      tags:
+        - Approval Workflows
+      summary: Create Sales Order Request
+      description: "Create a sales order creation request that requires approval"
+      operationId: Post-create-so-request
+      x-ms-summary: Create Approval Request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sales_order_data:
+                  type: object
+                  description: "Sales order data to be created after approval"
+                  x-ms-summary: "Sales Order Data"
+                justification:
+                  type: string
+                  description: "Business justification for the request"
+                  x-ms-summary: "Justification"
+              required: ["sales_order_data"]
+      responses:
+        '200':
+          description: Request created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                  status:
+                    type: string
+                  approve_url:
+                    type: string
+        '400':
+          description: Invalid request
+    options:
+      tags:
+        - Approval Workflows
+      summary: Create Sales Order Request (CORS)
+      operationId: Options-create-so-request
+      x-ms-summary: CORS Preflight for Create Request
+      responses:
+        '200':
+          description: CORS preflight response
+
+  /approve-request:
+    get:
+      tags:
+        - Approval Workflows
+      summary: Approve Sales Order Request
+      description: "Approve a pending sales order creation request via GET request with query parameters"
+      operationId: Get-approve-request
+      x-ms-summary: Approve Request (GET)
+      parameters:
+        - name: request_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "The approval request ID to approve"
+          x-ms-summary: "Request ID"
+        - name: approver_comments
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Optional approver comments"
+          x-ms-summary: "Approver Comments"
+      responses:
+        '200':
+          description: Approval processed successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: Invalid request
+        '404':
+          description: Request not found
+    post:
+      tags:
+        - Approval Workflows
+      summary: Approve Sales Order Request (POST)
+      description: "Approve a pending sales order creation request via POST request"
+      operationId: Post-approve-request
+      x-ms-summary: Approve Request (POST)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  description: "The approval request ID to approve"
+                approver_comments:
+                  type: string
+                  description: "Optional approver comments"
+              required: ["request_id"]
+      responses:
+        '200':
+          description: Approval processed successfully
+        '400':
+          description: Invalid request
+        '404':
+          description: Request not found
+
+  /reject-request:
+    get:
+      tags:
+        - Approval Workflows
+      summary: Reject Sales Order Request
+      description: "Reject a pending sales order creation request via GET request with query parameters"
+      operationId: Get-reject-request
+      x-ms-summary: Reject Request (GET)
+      parameters:
+        - name: request_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "The approval request ID to reject"
+          x-ms-summary: "Request ID"
+        - name: rejection_reason
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Optional rejection reason"
+          x-ms-summary: "Rejection Reason"
+      responses:
+        '200':
+          description: Rejection processed successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: Invalid request
+        '404':
+          description: Request not found
+    post:
+      tags:
+        - Approval Workflows
+      summary: Reject Sales Order Request (POST)
+      description: "Reject a pending sales order creation request via POST request"
+      operationId: Post-reject-request
+      x-ms-summary: Reject Request (POST)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  description: "The approval request ID to reject"
+                rejection_reason:
+                  type: string
+                  description: "Optional rejection reason"
+              required: ["request_id"]
+      responses:
+        '200':
+          description: Rejection processed successfully
+        '400':
+          description: Invalid request
+        '404':
+          description: Request not found
+
+  /list-approval-requests:
+    get:
+      tags:
+        - Approval Workflows
+      summary: List Approval Requests
+      description: "List all pending approval requests"
+      operationId: Get-list-approval-requests
+      x-ms-summary: List Approval Requests
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["pending", "approved", "rejected", "all"]
+            default: "pending"
+          description: "Filter by approval status"
+          x-ms-summary: "Status Filter"
+      responses:
+        '200':
+          description: List of approval requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        request_id:
+                          type: string
+                        status:
+                          type: string
+                        created_at:
+                          type: string
+                        sales_order_data:
+                          type: object
+
+  /health:
+    get:
+      tags:
+        - System Health
+      summary: Health Check
+      description: "Health check endpoint for monitoring service status"
+      operationId: Get-health
+      x-ms-summary: Service Health Check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                  version:
+                    type: string
 
 components:
   schemas:
@@ -183,3 +512,7 @@ security:
 tags:
   - name: S/4HANA Operations
     description: SAP S/4HANA business operations and data access
+  - name: Approval Workflows
+    description: Human-in-the-loop approval workflows for write operations
+  - name: System Health
+    description: Service monitoring and health check endpoints

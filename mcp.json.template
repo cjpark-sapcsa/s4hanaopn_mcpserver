@@ -1,7 +1,7 @@
 {
     "servers": {
         "s4hana-mcp-server": {
-            "url": "https://mcp2sapdemo.azure-api.net/s4hana-mcp-v2/sse",
+            "url": "https://your-apim-gateway.azure-api.net/s4hana-mcp-server/sse",
             "type": "sse",
             "headers": {
                 "Ocp-Apim-Subscription-Key": "YOUR_SUBSCRIPTION_KEY_HERE",
