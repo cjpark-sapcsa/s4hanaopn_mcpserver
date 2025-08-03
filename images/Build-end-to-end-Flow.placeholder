@@ -1,0 +1,26 @@
+# Placeholder for Build End-to-End Flow Image
+
+This is a placeholder file. Replace this with the actual "Build end to end Flow.png" image file.
+
+## Image Specifications
+- **Filename**: Build-end-to-end-Flow.png
+- **Content**: Complete deployment workflow diagram
+- **Size**: Recommended 1200px+ width
+- **Format**: PNG
+
+## Workflow Steps Shown in Image
+1. Azure Functions Development → Local MCP server development and testing
+2. Deployment to Azure Portal → Azure Functions deployment with environment configuration
+3. APIM Import API → Import Azure Functions as backend API in API Management
+4. Creation of MCP Server Under APIM → Export APIM API as MCP server endpoint
+5. Export of OpenAPI v3 (YAML or JSON) → Generate API specification for Copilot Studio
+6. Copilot Studio Creation of Agent → Create AI agent using OpenAPI specification
+7. Creation of Custom Connector → Power Automate connector for Teams integration
+8. Add Custom Connector as Tool in Copilot Studio → Integrate approval workflow in agent
+9. Test run for MCP Tool Discovery → Validate complete end-to-end functionality
+10. Publish into Copilot Agent → Deploy agent for business user access
+
+## To Replace This Placeholder
+1. Delete this file
+2. Add your actual PNG image file
+3. Name it exactly: `Build-end-to-end-Flow.png`
