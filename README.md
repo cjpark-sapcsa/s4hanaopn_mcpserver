@@ -69,11 +69,11 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
-│   MCP Clients   │    │   APIM Gateway   │    │   S/4HANA System   │
-│ • M365 Copilot  │◄──►│                  │◄──►│   OData APIs       │
+│   MCP Clients   │    │   APIM Gateway   │    │   S/4HANA System    │
+│ • M365 Copilot  │◄──►│                  │◄──►│   OData APIs        │
 │ • GitHub Agent  │    │  ┌─────────────┐ │    │                     │
-│ • Claude Desktop│    │  │Azure Functions│ │    │                     │
-│                 │    │  │  MCP Host    │ │    │                     │
+│ • Claude Desktop│    │  │Azure Functions│ │  │                     │
+│                 │    │  │  MCP Host     │ │  │                     │
 └─────────────────┘    │  └─────────────┘ │    └─────────────────────┘
                        └──────────────────┘
                                 │
@@ -81,19 +81,19 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
                        ┌─────────────────────────────────────────┐
                        │        Approval Workflow Engine         │
                        │                                         │
-                       │  ┌─────────────┐   ┌─────────────────┐ │
-                       │  │Azure Blob   │   │Power Automate   │ │
-                       │  │Storage      │◄─►│Teams Workflow   │ │
-                       │  │• Persistence│   │• YES/NO Buttons │ │
-                       │  │• Audit Trail│   │• Adaptive Cards │ │
-                       │  └─────────────┘   └─────────────────┘ │
+                       │  ┌─────────────┐   ┌─────────────────┐  │
+                       │  │Azure Blob   │   │Power Automate   │  │
+                       │  │Storage      │◄─►│Teams Workflow   │  │ 
+                       │  │• Persistence│   │• YES/NO Buttons │  │
+                       │  │• Audit Trail│   │• Adaptive Cards │  │
+                       │  └─────────────┘   └─────────────────┘  │
                        │                                         │
-                       │  ┌─────────────┐   ┌─────────────────┐ │
-                       │  │HTTP Approval│   │Email Notifications│ │
-                       │  │Endpoints    │   │• Request Alerts │ │
-                       │  │• approve-req│   │• Status Updates │ │
-                       │  │• reject-req │   │• Auto-routing   │ │
-                       │  └─────────────┘   └─────────────────┘ │
+                       │  ┌─────────────┐   ┌─────────────────┐  │
+                       │  │HTTP Approval│   │Email Notifications │ 
+                       │  │Endpoints    │   │• Request Alerts │  │
+                       │  │• approve-req│   │• Status Updates │  │
+                       │  │• reject-req │   │• Auto-routing   │  │
+                       │  └─────────────┘   └─────────────────┘  │
                        └─────────────────────────────────────────┘
 ```
 
@@ -816,24 +816,24 @@ Update `.vscode/mcp.json` for production:
 
 ## API Endpoints
 
-### MCP Protocol Endpoints
+**MCP Protocol Endpoints**
 - **SSE Endpoint**: `/api/sse` - Server-Sent Events for MCP communication
 - **Tools Discovery**: `/api/tools` - Available MCP tools
 
-### Copilot Studio Compatible Endpoints
+**Copilot Studio Compatible Endpoints**
 - **Query Sales Orders**: `/api/query-sales-orders` - Query sales orders (Copilot Studio format)
 - **Query Business Partners**: `/api/query-business-partners` - Query business partners
 - **Create Sales Order**: `/api/create-sales-order` - Create sales order with approval workflow
 
-### Power Automate Teams Approval Workflow Endpoints
+**Power Automate Teams Approval Workflow Endpoints**
 - **Create Approval Request**: `/api/create-so-request` - Submit sales order for approval
 - **Approve Request**: `/api/approve-request?request_id={id}` - Approve pending request (YES button)
 - **Reject Request**: `/api/reject-request?request_id={id}` - Reject pending request (NO button)
 
-### Utility Endpoints
+**Utility Endpoints**
 - **Health Check**: `/api/health` - Service health status and connectivity check
 
-### Teams Webhook Integration Flow
+**Teams Webhook Integration Flow**
 1. **MCP Request** → `/api/sse` → Sales order creation intercepted
 2. **Approval Creation** → `/api/create-so-request` → Azure Blob Storage + Teams notification
 3. **Teams Adaptive Card** → YES button → `/api/approve-request?request_id=X`
@@ -843,14 +843,14 @@ Update `.vscode/mcp.json` for production:
 
 ## Supported S/4HANA Entities
 
-### Business Partner API
+**Business Partner API**
 - `businesspartners` - Business partner master data
 - `businesspartneraddresses` - Partner addresses
 - `businesspartnercontacts` - Partner contacts
 - `customers` - Customer data
 - `suppliers` - Supplier data
 
-### Sales Order API
+**Sales Order API**
 - `salesorders` - Sales order headers
 - `salesorderitems` - Sales order line items
 - `salesorderheaderpartners` - Header partner data
