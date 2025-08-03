@@ -193,9 +193,9 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 
 ### Build End-to-End Flow
 
-> **Note**: Add the `Build end to end Flow.png` image file to the repository root to display the complete deployment workflow diagram.
+![Build end to end Flow](images/Build-end-to-end-Flow.png)
 
-<!-- ![Build end to end Flow](Build%20end%20to%20end%20Flow.png) -->
+> **Note**: The complete deployment workflow diagram is located in the `images/` directory. If the image doesn't display, ensure the `Build-end-to-end-Flow.png` file is placed in the `images/` folder.
 
 The complete deployment follows this sequence:
 1. **Azure Functions Development** → Local MCP server development and testing
@@ -866,24 +866,24 @@ Update `.vscode/mcp.json` for production with APIM Gateway:
 
 ## API Endpoints
 
-**MCP Protocol Endpoints**
+### MCP Protocol Endpoints
 - **SSE Endpoint**: `/api/sse` - Server-Sent Events for MCP communication
 - **Tools Discovery**: `/api/tools` - Available MCP tools
 
-**Copilot Studio Compatible Endpoints**
+### Copilot Studio Compatible Endpoints
 - **Query Sales Orders**: `/api/query-sales-orders` - Query sales orders (Copilot Studio format)
 - **Query Business Partners**: `/api/query-business-partners` - Query business partners
 - **Create Sales Order**: `/api/create-sales-order` - Create sales order with approval workflow
 
-**Power Automate Teams Approval Workflow Endpoints**
+### Power Automate Teams Approval Workflow Endpoints
 - **Create Approval Request**: `/api/create-so-request` - Submit sales order for approval
 - **Approve Request**: `/api/approve-request?request_id={id}` - Approve pending request (YES button)
 - **Reject Request**: `/api/reject-request?request_id={id}` - Reject pending request (NO button)
 
-**Utility Endpoints**
+### Utility Endpoints
 - **Health Check**: `/api/health` - Service health status and connectivity check
 
-**Teams Webhook Integration Flow**
+### Teams Webhook Integration Flow
 1. **MCP Request** → `/api/sse` → Sales order creation intercepted
 2. **Approval Creation** → `/api/create-so-request` → Azure Blob Storage + Teams notification
 3. **Teams Adaptive Card** → YES button → `/api/approve-request?request_id=X`
@@ -893,14 +893,14 @@ Update `.vscode/mcp.json` for production with APIM Gateway:
 
 ## Supported S/4HANA Entities
 
-**Business Partner API**
+### Business Partner API
 - `businesspartners` - Business partner master data
 - `businesspartneraddresses` - Partner addresses
 - `businesspartnercontacts` - Partner contacts
 - `customers` - Customer data
 - `suppliers` - Supplier data
 
-**Sales Order API**
+### Sales Order API
 - `salesorders` - Sales order headers
 - `salesorderitems` - Sales order line items
 - `salesorderheaderpartners` - Header partner data
