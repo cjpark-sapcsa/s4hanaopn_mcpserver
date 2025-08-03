@@ -408,9 +408,9 @@ curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
    - Select **"Add an action"** → **"Model Context Protocol (MCP)"**
 
 2. **Configure MCP Server Connection**:
-   - **Server URL**: `https://your-s4hana-mcp-app.azurewebsites.net/api/sse`
+   - **Server URL**: `https://your-s4hana-apim.azure-api.net/mcp`
    - **Connection Name**: `S4HANA-MCP-Server`
-   - **Authentication**: Select **"No authentication"** (or configure as needed)
+   - **Authentication**: Select **"API key"** and provide your APIM subscription key
    - **Test Connection**: Verify connection works
 
 #### 4. **Configure Available Actions**
@@ -470,8 +470,10 @@ After connecting, Copilot Studio will discover available MCP tools:
    - Provide guidance on S/4HANA operations
    - Explain approval workflow process
 
-#### 8. **Optional: APIM Gateway (Advanced)**
-For enhanced security and management, optionally use APIM:
+#### 8. **APIM Gateway (Mandatory)**
+For enhanced security and management, APIM is required for production MCP server deployment:
+
+> **Microsoft Reference**: Follow the official guide: [Export a REST API from Azure API Management as an MCP server](https://learn.microsoft.com/en-us/azure/api-management/export-rest-mcp-server#expose-api-as-an-mcp-server)
 
 1. **Create API Management Service**:
 ```bash
@@ -485,12 +487,28 @@ az apim create \
 ```
 
 2. **Configure APIM as MCP Gateway**:
-   - Import Azure Function as backend
-   - Set up subscription keys
-   - Configure rate limiting and policies
-   - Update Copilot Studio to use APIM endpoint
+   - **Import Azure Function as Backend**: Add your Function App as APIM backend service
+   - **Set up Subscription Keys**: Configure API subscription keys for secure access
+   - **Configure Rate Limiting**: Implement policies for request throttling and quotas
+   - **MCP Server Export**: Use APIM's MCP server export functionality
+   - **Update Client Configuration**: Configure MCP clients to use APIM endpoint
 
-> **Note**: Direct Azure Function integration is recommended for simplicity. Use APIM only if you need advanced API management features.
+3. **MCP Server URL Configuration**:
+   - **APIM MCP Endpoint**: `https://your-s4hana-apim.azure-api.net/mcp`
+   - **Subscription Key Header**: `Ocp-Apim-Subscription-Key`
+   - **Function Backend**: `https://your-s4hana-mcp-app.azurewebsites.net`
+
+4. **Update Copilot Studio Configuration**:
+   ```json
+   {
+     "url": "https://your-s4hana-apim.azure-api.net/mcp",
+     "headers": {
+       "Ocp-Apim-Subscription-Key": "your-subscription-key"
+     }
+   }
+   ```
+
+> **Note**: APIM Gateway is mandatory for production deployments to ensure enterprise-grade security, monitoring, and management of the MCP server.
 
 ### Step 7: Power Automate & Teams Setup
 
@@ -775,9 +793,12 @@ When ready for production:
 # Deploy to Azure
 func azure functionapp publish your-function-app-name
 
+# Configure APIM Gateway (mandatory for production)
+az apim create --resource-group rg-s4hana-mcp --name your-s4hana-apim --sku-name Basic
+
 # Update MCP client configuration
 # FROM: "url": "http://localhost:7071/api/sse"
-# TO:   "url": "https://your-apim-gateway.azure-api.net/s4hana-mcp-server/sse"
+# TO:   "url": "https://your-s4hana-apim.azure-api.net/mcp"
 ```
 
 ### Azure Deployment
@@ -790,20 +811,32 @@ func start
 func azure functionapp publish your-function-app-name
 ```
 
-#### APIM Gateway Configuration
-After Azure Functions deployment, the MCP server is exposed through Azure API Management:
+#### APIM Gateway Configuration (Mandatory)
+After Azure Functions deployment, the MCP server must be exposed through Azure API Management:
 
 1. **Azure Functions** (MCP Host): `https://your-function-app.azurewebsites.net`
-2. **APIM Gateway** (MCP Server): `https://your-apim-gateway.azure-api.net`
-3. **MCP Endpoint**: `/s4hana-mcp-server/sse`
+2. **APIM Gateway** (MCP Server): `https://your-s4hana-apim.azure-api.net`
+3. **MCP Endpoint**: `/mcp` (using APIM's MCP server export feature)
+
+**Architecture Flow:**
+```
+MCP Clients → APIM Gateway → Azure Functions → S/4HANA OData APIs
+```
+
+**Benefits of APIM Gateway:**
+- **Enterprise Security**: Subscription key authentication and OAuth integration
+- **Rate Limiting**: Request throttling and quota management
+- **Monitoring**: Comprehensive API analytics and usage tracking
+- **Policy Enforcement**: Custom policies for validation, transformation, and caching
+- **MCP Protocol Support**: Native MCP server export functionality
 
 #### Production MCP Client Configuration
-Update `.vscode/mcp.json` for production:
+Update `.vscode/mcp.json` for production with APIM Gateway:
 ```json
 {
     "servers": {
         "s4hana-mcp-server": {
-            "url": "https://your-apim-gateway.azure-api.net/s4hana-mcp-server/sse",
+            "url": "https://your-s4hana-apim.azure-api.net/mcp",
             "type": "http",
             "headers": {
                 "Content-Type": "application/json",
