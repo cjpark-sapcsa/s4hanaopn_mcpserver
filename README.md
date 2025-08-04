@@ -4,66 +4,47 @@ Enterprise-grade agentic AI solution that empowers business users and sales team
 
 ## Overview
 
-This repository provides a complete **agentic AI platform** for S/4HANA sales operations, enabling business users to enhance their sales processes through conversational AI interactions. The solution connects **AI agents** (Copilot Studio, GitHub Agents, M365 Copilot) directly to **S/4HANA 2023 FPS02** data via a secure MCP server.
+This repository provides an **agentic AI platform** for S/4HANA sales operations, connecting AI agents (Copilot Studio, GitHub Agents, M365 Copilot) directly to **S/4HANA 2023 FPS02** via a secure MCP server.
 
-### For Business Users & Sales Teams
-- **Natural Language Sales Operations**: "Show me all open orders for customer ABC Corp" or "Create a sales order for 100 units of product XYZ"
-- **Intelligent Sales Insights**: AI-powered analysis of sales data, customer patterns, and order trends
-- **Streamlined Order Management**: Conversational sales order creation with automated approval workflows
-- **Real-time Business Partner Information**: Instant access to customer data, payment terms, and order history
-- **Enhanced Productivity**: Reduce manual data entry and system navigation through AI assistance
+**Key Capabilities:**
+- **Natural Language Operations**: "Show me orders for customer ABC" or "Create a sales order for 100 units"
+- **Intelligent Approval Workflows**: Automated routing with Teams integration for governance
+- **Enterprise Security**: APIM gateway with subscription keys and comprehensive monitoring
+- **Production Ready**: 2000+ lines of code with error handling and Azure Functions deployment
 
-### For Developers & IT Teams
-- **MCP Server Discovery**: Complete toolset for building S/4HANA-integrated AI agents
-- **Secure API Gateway**: APIM-protected endpoints with subscription key management and rate limiting
-- **Enterprise Integration**: Production-ready Azure Functions with comprehensive error handling and monitoring
-- **Extensible Architecture**: Modular design supporting additional S/4HANA entities and business processes
-- **Developer-Friendly APIs**: Standard MCP protocol with OpenAPI documentation and test scenarios
-
-### How It Enhances Sales Operations
-1. **🚀 Accelerated Order Processing**: Convert natural language requests into S/4HANA sales orders instantly
-2. **🔍 Intelligent Data Discovery**: AI agents automatically find relevant customer and product information
-3. **⚡ Real-time Decision Support**: Access live S/4HANA data for immediate sales insights and recommendations
-4. **🛡️ Governance & Compliance**: Built-in approval workflows ensure proper authorization for financial transactions
-5. **📱 Teams Integration**: Sales approvals happen directly in Microsoft Teams with one-click responses
-6. **📊 Enhanced Visibility**: Complete audit trails and transparency in AI-driven sales processes
+**Business Impact:**
+- 🚀 **Accelerated Processing**: Natural language to S/4HANA sales orders instantly
+- 🛡️ **Governance & Compliance**: Built-in approval workflows with audit trails  
+- 📱 **Teams Integration**: One-click approvals directly in Microsoft Teams
 
 ## Features
 
-- **Business Partner Management**: Query and manage business partner data
-- **Sales Order Operations**: Create, query, and manage sales orders with approval workflow
-- **Approval Workflow**: Automatic routing of sales order requests through approval process
-- **Teams Integration**: Real-time notifications and approval buttons in Microsoft Teams
-- **Email Notifications**: Automated email alerts for approval requests and status updates
-- **Payload Validation**: Automatic cleanup of custom fields to ensure S/4HANA API compatibility
-- **Governance Controls**: All sales order creation enforces approval workflow - no direct creation allowed
-- **Azure Functions Deployment**: Serverless architecture for scalability
-- **MCP Protocol Support**: Compatible with Claude Desktop and other MCP clients
+**Core Functionality:**
+- **Business Partner & Sales Order Management** with approval workflows
+- **Teams Integration** with real-time notifications and approval buttons  
+- **MCP Protocol Support** for Claude Desktop and AI agents
+- **Enterprise Security** with payload validation and governance controls
+
+**Technical Stack:**
+- **Azure Functions** serverless architecture with auto-scaling
+- **APIM Gateway** for secure endpoint management and rate limiting
+- **Azure Blob Storage** for persistent approval tracking and audit trails
 
 ## Technical Architecture
 
-### Core Components (2000+ lines)
-- **MCP Protocol Server**: Complete Model Context Protocol implementation with SSE communication
-- **APIM Gateway**: Azure API Management for secure endpoint exposure and subscription key management
-- **Azure Functions**: Serverless MCP host with auto-scaling and enterprise security
-- **Custom Connector**: Power Automate integration via custom connectors for Teams workflow
-- **OpenAPI 3.0 Schema**: Manual YAML configuration for API documentation and validation
-- **S/4HANA OData Integration**: Business Partner and Sales Order API integration with CSRF handling
-- **Approval Workflow Engine**: Automated sales order approval routing with governance controls
-- **Azure Blob Storage**: Persistent approval request storage with automatic cleanup
-- **Teams Integration**: Real-time adaptive card notifications via Power Automate webhooks
-- **Date Formatting Engine**: Automatic conversion to S/4HANA OData format (`/Date(timestamp)/`)
-- **Payload Validation**: Smart field cleanup to ensure S/4HANA API compatibility
-- **Security Framework**: Environment-based configuration with managed identity support
+**Core Stack (2000+ lines):**
+- **MCP Protocol Server** with SSE communication
+- **APIM Gateway** for secure endpoint exposure  
+- **Azure Functions** serverless MCP host with enterprise security
+- **S/4HANA OData Integration** with CSRF handling and approval workflows
+- **Teams Integration** via Power Automate webhooks and adaptive cards
+- **Azure Blob Storage** for persistent approval tracking with audit trails
 
-### Key Features
-- **production-ready code** with comprehensive error handling
-- **14 Azure Function endpoints** covering MCP, Copilot Studio, and approval workflows
-- **Intelligent date parsing** supporting multiple formats with S/4HANA conversion
-- **Persistent approval tracking** using Azure Blob Storage for scalability
-- **Real-time notifications** via Microsoft Teams with approval buttons
-- **Complete payload cleanup** removing custom fields that cause S/4HANA errors
-- **Enterprise security** with all credentials externalized to environment variables
+**Production Features:**
+- 14 Azure Function endpoints covering MCP, Copilot Studio, and approval workflows
+- Intelligent date parsing with S/4HANA OData format conversion
+- Complete payload cleanup preventing S/4HANA API errors
+- Environment-based security with externalized credentials
 
 ## Architecture
 
@@ -196,16 +177,16 @@ This repository provides a complete **agentic AI platform** for S/4HANA sales op
 <img width="2104" height="1160" alt="build end to end MCP server" src="https://github.com/user-attachments/assets/aded88db-a000-4b73-b1db-13d453c7bdfa" />
 
 The complete deployment follows this sequence:
-1. **Azure Functions Development** → Local MCP server development and testing
-2. **Deployment to Azure Portal** → Azure Functions deployment with environment configuration
-3. **APIM Import API** → Import Azure Functions as backend API in API Management
-4. **Creation of MCP Server Under APIM** → Export APIM API as MCP server endpoint
-5. **Export of OpenAPI v3 (YAML or JSON)** → Generate API specification for Copilot Studio
-6. **Copilot Studio Creation of Agent** → Create AI agent using OpenAPI specification
-7. **Creation of Custom Connector** → Power Automate connector for Teams integration
-8. **Add Custom Connector as Tool in Copilot Studio** → Integrate approval workflow in agent
-9. **Test run for MCP Tool Discovery** → Validate complete end-to-end functionality
-10. **Publish into Copilot Agent** → Deploy agent for business user access
+1. **Azure Functions Development** → Local MCP server development and testing (**Step 1-2**)
+2. **Deployment to Azure Portal** → Azure Functions deployment with environment configuration (**Step 4**)
+3. **APIM Import API** → Import Azure Functions as backend API in API Management (**Step 4**)
+4. **Creation of MCP Server Under APIM** → Export APIM API as MCP server endpoint (**Step 4**)
+5. **Export of OpenAPI v3 (YAML or JSON)** → Generate API specification for Copilot Studio (**Step 7**)
+6. **Copilot Studio Creation of Agent** → Create AI agent using OpenAPI specification (**Step 6**)
+7. **Creation of Custom Connector** → Power Automate connector for Teams integration (**Step 8**)
+8. **Add Custom Connector as Tool in Copilot Studio** → Integrate approval workflow in agent (**Step 9**)
+9. **Test run for MCP Tool Discovery** → Validate complete end-to-end functionality (**Step 10**)
+10. **Publish into Copilot Agent** → Deploy agent for business user access (**Step 6**)
 
 ### Step 1: Environment Setup
 
@@ -536,7 +517,30 @@ After connecting, Copilot Studio will discover available MCP tools:
    - Provide guidance on S/4HANA operations
    - Explain approval workflow process
 
-### Step 7: Power Automate & Teams Setup
+### Step 7: Export OpenAPI v3 for Custom Connector
+
+1. **Export OpenAPI Specification from APIM**:
+   - Navigate to Azure Portal → API Management → your-s4hana-apim
+   - Select **APIs** → Select your S/4HANA Function App API
+   - Click **Export** → **OpenAPI v3 (YAML)** or **OpenAPI v3 (JSON)**
+   - Download the specification file (e.g., `s4hana-api-spec.yaml`)
+
+2. **Validate OpenAPI Specification**:
+   ```bash
+   # Verify the downloaded specification contains required endpoints
+   # Key endpoints for Power Automate integration:
+   # - /api/create-so-request
+   # - /api/approve-request
+   # - /api/reject-request
+   # - /api/check-approval-status
+   ```
+
+3. **Prepare for Custom Connector Creation**:
+   - Ensure OpenAPI spec includes proper authentication (API key)
+   - Verify all required sales order endpoints are documented
+   - Check parameter definitions for Power Automate compatibility
+
+### Step 8: Power Automate & Teams Setup
 
 1. **Create Power Automate Flow**:
    - Go to Power Automate portal
@@ -552,10 +556,40 @@ After connecting, Copilot Studio will discover available MCP tools:
 
 3. **Create Custom Connector** (if needed):
    - Power Automate → Custom connectors
-   - Import OpenAPI definition
+   - Import OpenAPI definition from Step 7
    - Configure authentication (API key)
+   - Test connector endpoints
 
-### Step 8: Verification
+### Step 9: Add Custom Connector as Tool in Copilot Studio
+
+1. **Import Custom Connector into Copilot Studio**:
+   - Navigate back to your S/4HANA Sales Assistant agent in Copilot Studio
+   - Go to **Actions** tab → **Add an action** → **Custom connector**
+   - Select the Power Automate custom connector created in Step 8
+   - Configure connector authentication and parameters
+
+2. **Configure Approval Workflow Actions**:
+   - **Enable Actions**:
+     - ✅ `create-so-request` - Submit sales orders for approval
+     - ✅ `approve-request` - Approve pending requests  
+     - ✅ `reject-request` - Reject pending requests
+     - ✅ `check-approval-status` - Query approval status
+
+3. **Update Agent Instructions**:
+   ```
+   You now have access to approval workflow actions. When users request sales order creation:
+   1. Use MCP actions for data queries and validation
+   2. Use custom connector actions for approval workflow management
+   3. Always provide request IDs for tracking
+   4. Explain the approval process to users
+   ```
+
+4. **Test Integration**:
+   - Test MCP + Custom Connector workflow
+   - Verify Teams notifications trigger properly
+   - Ensure approval buttons work correctly
+
+### Step 10: Verification
 
 1. **Test end-to-end flow**:
    - Use MCP client to query sales orders
@@ -1327,43 +1361,6 @@ curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
 - Submit invalid approval request ID
 - Test with malformed JSON
 - Verify errors are properly logged and tracked
-
-### Test Automation
-
-#### 1. **CI/CD Pipeline Tests**
-
-**GitHub Actions Workflow:**
-```yaml
-name: MCP Server Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Run unit tests
-        run: pytest tests/
-      - name: Test MCP protocol
-        run: python tests/test_mcp_protocol.py
-      - name: Integration tests
-        run: python tests/test_integration.py
-```
-
-#### 2. **Automated Test Suite**
-
-**Test Categories:**
-- ✅ **Unit Tests**: Individual function validation
-- ✅ **Integration Tests**: End-to-end workflow testing
-- ✅ **Performance Tests**: Load and stress testing
-- ✅ **Security Tests**: Authentication and input validation
-- ✅ **Error Handling Tests**: Failure scenario validation
-- ✅ **Monitoring Tests**: Observability and logging verification
 
 ### Test Results Documentation
 
