@@ -11,6 +11,6 @@
     "AZURE_STORAGE_CONNECTION_STRING": "your-azure-storage-connection-string",
     "BLOB_STORAGE_URL": "https://your-storage-account.blob.core.windows.net/salesorderrequest",
     "BLOB_STORAGE_ACCOUNT_URL": "https://your-storage-account.blob.core.windows.net",
-    "BLOB_CONTAINER_NAME": "salesorderrequest"
+    "BLOB_CONTAINER_NAME": "your-own-azure-conatiner"
   }
 }
