@@ -112,9 +112,9 @@ This repository provides an **agentic AI platform** for S/4HANA sales operations
 - **Real-time Updates**: Card updates automatically when decision is made
 
 #### HTTP Approval Endpoints
-- **`/api/approve-request?request_id={id}`**: Approves pending request (triggered by YES button)
-- **`/api/reject-request?request_id={id}`**: Rejects pending request (triggered by NO button)  
-- **`/api/create-so-request`**: Creates new approval request (triggered by MCP sales order creation)
+- `/api/approve-request?request_id={id}`: Approves pending request (triggered by YES button)
+- `/api/reject-request?request_id={id}`: Rejects pending request (triggered by NO button)  
+- `/api/create-so-request`: Creates new approval request (triggered by MCP sales order creation)
 
 #### Azure Blob Storage Integration
 - **Persistent Request Storage**: All approval requests survive function restarts/scaling
@@ -910,29 +910,29 @@ Update `.vscode/mcp.json` for production with APIM Gateway:
 ## API Endpoints
 
 ### MCP Protocol Endpoints
-- **SSE Endpoint**: `/api/sse` - Server-Sent Events for MCP communication
-- **Tools Discovery**: `/api/tools` - Available MCP tools
+- SSE Endpoint: `/api/sse` - Server-Sent Events for MCP communication
+- Tools Discovery: `/api/tools` - Available MCP tools
 
 ### Copilot Studio Compatible Endpoints
-- **Query Sales Orders**: `/api/query-sales-orders` - Query sales orders (Copilot Studio format)
-- **Query Business Partners**: `/api/query-business-partners` - Query business partners
-- **Create Sales Order**: `/api/create-sales-order` - Create sales order with approval workflow
+- Query Sales Orders: `/api/query-sales-orders` - Query sales orders (Copilot Studio format)
+- Query Business Partners: `/api/query-business-partners` - Query business partners
+- Create Sales Order: `/api/create-sales-order` - Create sales order with approval workflow
 
 ### Power Automate Teams Approval Workflow Endpoints
-- **Create Approval Request**: `/api/create-so-request` - Submit sales order for approval
-- **Approve Request**: `/api/approve-request?request_id={id}` - Approve pending request (YES button)
-- **Reject Request**: `/api/reject-request?request_id={id}` - Reject pending request (NO button)
+- Create Approval Request: `/api/create-so-request` - Submit sales order for approval
+- Approve Request: `/api/approve-request?request_id={id}` - Approve pending request (YES button)
+- Reject Request: `/api/reject-request?request_id={id}` - Reject pending request (NO button)
 
 ### Utility Endpoints
-- **Health Check**: `/api/health` - Service health status and connectivity check
+- Health Check: `/api/health` - Service health status and connectivity check
 
 ### Teams Webhook Integration Flow
-1. **MCP Request** → `/api/sse` → Sales order creation intercepted
-2. **Approval Creation** → `/api/create-so-request` → Azure Blob Storage + Teams notification
-3. **Teams Adaptive Card** → YES button → `/api/approve-request?request_id=X`
-4. **Teams Adaptive Card** → NO button → `/api/reject-request?request_id=X`
-5. **Automatic S/4HANA Creation** → Upon approval → Direct OData API call
-6. **Status Notifications** → Email + Teams updates to all stakeholders
+1. MCP Request → `/api/sse` → Sales order creation intercepted
+2. Approval Creation → `/api/create-so-request` → Azure Blob Storage + Teams notification
+3. Teams Adaptive Card → YES button → `/api/approve-request?request_id=X`
+4. Teams Adaptive Card → NO button → `/api/reject-request?request_id=X`
+5. Automatic S/4HANA Creation → Upon approval → Direct OData API call
+6. Status Notifications → Email + Teams updates to all stakeholders
 
 ## Supported S/4HANA Entities
 
@@ -954,44 +954,44 @@ Update `.vscode/mcp.json` for production with APIM Gateway:
 
 ## Security
 
-- **Approval Workflow Governance**: All sales order creation enforced through approval process
-- **Payload Validation**: Automatic removal of custom fields to prevent S/4HANA API errors
-- **Azure AD Authentication**: Supported for enterprise integration
-- **Environment Variable Security**: Sensitive credentials stored in environment variables
-- **Network Security**: Azure private endpoints and VNet integration supported
-- **Audit Trail**: All approval requests logged with timestamps and approvers
-- **Access Control**: Role-based access to approval endpoints
+- Approval Workflow Governance: All sales order creation enforced through approval process
+- Payload Validation: Automatic removal of custom fields to prevent S/4HANA API errors
+- Azure AD Authentication: Supported for enterprise integration
+- Environment Variable Security: Sensitive credentials stored in environment variables
+- Network Security: Azure private endpoints and VNet integration supported
+- Audit Trail: All approval requests logged with timestamps and approvers
+- Access Control: Role-based access to approval endpoints
 
 ## Monitoring
 
-- **Application Insights Integration**: Comprehensive telemetry and performance monitoring
-- **Azure Monitor Metrics**: Real-time health and performance metrics
-- **Custom Logging**: Detailed approval workflow and S/4HANA integration logs
-- **Health Check Endpoints**: Automated service health monitoring
-- **Approval Workflow Tracking**: Complete audit trail of all approval requests
-- **Teams Notification Monitoring**: Delivery status tracking for Teams messages
-- **S/4HANA Connectivity Monitoring**: Real-time OData API connectivity checks
+- Application Insights Integration: Comprehensive telemetry and performance monitoring
+- Azure Monitor Metrics: Real-time health and performance metrics
+- Custom Logging: Detailed approval workflow and S/4HANA integration logs
+- Health Check Endpoints: Automated service health monitoring
+- Approval Workflow Tracking: Complete audit trail of all approval requests
+- Teams Notification Monitoring: Delivery status tracking for Teams messages
+- S/4HANA Connectivity Monitoring: Real-time OData API connectivity checks
 
 ## Testing
 
 ### Test Environment Setup
 
 #### Prerequisites for Testing
-- **Azure Function App deployed** - MCP server running in Azure
-- **S/4HANA connectivity** - Test system access configured
-- **Power Automate flow** - Teams approval workflow active
-- **Azure Blob Storage** - Container for approval requests
-- **MCP Client** - VS Code with MCP extension or Copilot Studio agent
+- Azure Function App deployed - MCP server running in Azure
+- S/4HANA connectivity - Test system access configured
+- Power Automate flow - Teams approval workflow active
+- Azure Blob Storage - Container for approval requests
+- MCP Client - VS Code with MCP extension or Copilot Studio agent
 
 #### Test Data Requirements
-- **Test Customer**: `USCU_L10` (or valid S/4HANA customer)
-- **Test Materials**: Valid material numbers in S/4HANA
-- **Test Users**: Approved sales users and approvers
-- **Teams Channels**: Configured for approval notifications
+- Test Customer: `USCU_L10` (or valid S/4HANA customer)
+- Test Materials: Valid material numbers in S/4HANA
+- Test Users: Approved sales users and approvers
+- Teams Channels: Configured for approval notifications
 
 ### Unit Testing
 
-#### 1. **Health Check Tests**
+#### 1. Health Check Tests
 ```bash
 # Test basic connectivity
 curl https://your-s4hana-mcp-app.azurewebsites.net/api/health
@@ -1006,7 +1006,7 @@ curl https://your-s4hana-mcp-app.azurewebsites.net/api/health
 }
 ```
 
-#### 2. **MCP Protocol Tests**
+#### 2. MCP Protocol Tests
 ```bash
 # Test MCP tools discovery
 curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
@@ -1024,7 +1024,7 @@ curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
 # - check_and_create_sales_orders
 ```
 
-#### 3. **S/4HANA Connectivity Tests**
+#### 3. S/4HANA Connectivity Tests
 ```bash
 # Test business partner query
 curl -X POST https://your-s4hana-mcp-app.azurewebsites.net/api/sse \
