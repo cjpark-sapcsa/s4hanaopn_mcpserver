@@ -230,7 +230,7 @@
     },
     "apis": {
       "business_partner": {
-        "base_url": "http://sbx-s4s-app.northeurope.cloudapp.azure.com:54000/sap/opu/odata/sap/API_BUSINESS_PARTNER",
+        "base_url": "http://<s4hana appserver>:54000/sap/opu/odata/sap/API_BUSINESS_PARTNER",
         "version": "1.0.0",
         "entities": [
           "A_BusinessPartner",
@@ -241,7 +241,7 @@
         ]
       },
       "sales_order": {
-        "base_url": "http://sbx-s4s-app.northeurope.cloudapp.azure.com:54000/sap/opu/odata/sap/API_SALES_ORDER_SRV",
+        "base_url": "http://<s4han appserver>:54000/sap/opu/odata/sap/API_SALES_ORDER_SRV",
         "version": "1.0.0", 
         "entities": [
           "A_SalesOrder",
